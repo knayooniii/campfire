@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="adminRegistrationMapper">
+	<resultMap type="adminBusinessRegistration"
+		id="adminBusinessRegistrationResultSet">
+		<result column="BR_NUM" property="brNum"></result>
+		<result column="M_NUM" property="memberNum"></result>
+		<result column="BR_COMPANY" property="brCompany"></result>
+		<result column="BR_STTCD" property="brSttCd"></result>
+		<result column="BR_AR_STTCD" property="brArSttCd"></result>
+		<result column="BR_REASON" property="brReason"></result>
+		<result column="BR_REPNAME" property="brRepname"></result>
+		<result column="BR_CREATE_DATE" property="brCreateDate"></result>
+	</resultMap>
+
+	<resultMap type="adminCampRegistration"
+		id="adminCampRegistrationResultSet">
+		<result column="C_NUM" property="campNum"></result>
+		<result column="M_NUM" property="memberNum"></result>
+		<result column="C_NAME" property="campName"></result>
+		<result column="C_POSTCODE" property="campPostCode"></result>
+		<result column="C_ADDR" property="campAddr"></result>
+		<result column="C_TYPE" property="campType"></result>
+		<result column="C_LINK" property="campLink"></result>
+		<result column="C_APLACE" property="campAPlace"></result>
+		<result column="C_MAP_X" property="campX"></result>
+		<result column="C_MAP_Y" property="campY"></result>
+		<result column="C_CHECK" property="campCheck"></result>
+		<result column="C_INTRO" property="campIntro"></result>
+		<result column="C_OFFSD_PRICE" property="campOffsdPrice"></result>
+		<result column="C_OFFSW_PRICE" property="campOffswPrice"></result>
+		<result column="C_SD_PRICE" property="campSdPrice"></result>
+		<result column="C_SW_PRICE" property="campSwPrice"></result>
+		<result column="C_PHONENUM" property="campPhoneNum"></result>
+		<result column="C_CREATE_DATE" property="campCreateDate"></result>
+		<result column="C_REASON" property="campReason"></result>
+	</resultMap>
+
+	<resultMap type="adminCampRegistrationPhoto"
+		id="adminCampRegistrationPhotoResultSet">
+		<result column="C_NUM" property="campNum"></result>
+		<result column="CP_NAME" property="campPhotoName"></result>
+		<result column="CP_URL" property="campPhotoURL"></result>
+	</resultMap>
+	
+	<resultMap type="adminCampRegistrationAmenity"
+		id="adminCampRegistrationAmenityResultSet">
+		<result column="C_NUM" property="campNum"></result>
+		<result column="CA_AMENITY" property="campAmenityPhoto"></result>
+		<result column="CA_AME_NAME" property="campAmenityItem"></result>
+	</resultMap>
+	
+	<resultMap type="adminCampRegistrationTag"
+		id="adminCampRegistrationTagResultSet">
+		<result column="C_NUM" property="campNum"></result>
+		<result column="CT_TAG" property="campTagItem"></result>
+	</resultMap>
+
+	<select id="selectBusinessRegistrationListCount"
+		resultType="_int">
+		SELECT COUNT(*) FROM BUSINESS_REGISTRATION where
+		BR_AR_STTCD = 'N'
+	</select>
+
+	<select id="selectBusinessRegistrationList"
+		resultMap="adminBusinessRegistrationResultSet">
+		SELECT * FROM BUSINESS_REGISTRATION where BR_AR_STTCD = 'N'
+		ORDER BY m_num DESC
+	</select>
+
+	<update id="approvalBusinessRegistration">
+		UPDATE BUSINESS_REGISTRATION SET BR_AR_STTCD = 'Y'
+		WHERE BR_NUM = #{brNum}
+	</update>
+
+	<update id="refuseBusinessRegistration">
+		UPDATE BUSINESS_REGISTRATION SET BR_AR_STTCD = 'R',
+		BR_REASON = #{brReason} WHERE BR_NUM = #{brNum}
+	</update>
+
+
+
+	<select id="selectCampRegistrationListCount" resultType="_int">
+		SELECT
+		COUNT(*) FROM CAMP_INFO WHERE c_check = 'N'
+	</select>
+
+	<select id="selectCampRegistrationList"
+		resultMap="adminCampRegistrationResultSet">
+		SELECT * FROM CAMP_INFO WHERE c_check = 'N'
+		ORDER BY
+		C_CREATE_DATE DESC
+	</select>
+
+	<select id="selectCampRegistrationPhotoList"
+		resultMap="adminCampRegistrationPhotoResultSet">
+		SELECT * FROM CAMP_PHOTO WHERE c_num = #{campNum}
+		ORDER BY
+		cp_name
+	</select>
+	
+	<select id="selectCampRegistrationAmenityList"
+		resultMap="adminCampRegistrationAmenityResultSet">
+		SELECT * FROM CAMP_AMENITY WHERE c_num = #{campNum}
+	</select>
+	
+	<select id="selectCampRegistrationTagList"
+		resultMap="adminCampRegistrationTagResultSet">
+		SELECT * FROM CAMP_TAG WHERE c_num = #{campNum}
+	</select>
+
+
+	<select id="selectCampRegistration"
+		resultMap="adminCampRegistrationResultSet">
+		SELECT * FROM CAMP_INFO WHERE c_num = #{campNum}
+	</select>
+	
+	<update id="approvalCampRegistration">
+		UPDATE CAMP_INFO SET C_CHECK = 'Y'
+		WHERE C_NUM = #{campNum}
+	</update>
+
+	<update id="refuseCampRegistration">
+		UPDATE CAMP_INFO SET C_CHECK = 'R',
+		C_REASON = #{campReason} WHERE C_NUM = #{campNum}
+	</update>
+</mapper>

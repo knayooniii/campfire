@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd" >
+<configuration>
+	<settings>
+		<setting name="jdbcTypeForNull" value="NULL" />
+		<setting name="mapUnderscoreToCamelCase" value="true" />
+	</settings>
+	
+	<typeAliases>
+		<!-- 로그인,회원가입 -->
+		<typeAlias type="kr.co.campfire.member.dto.MemberDto" alias="login" />
+		
+		<!-- User -->
+		<typeAlias type="kr.co.campfire.user.userBoard.dto.UserBoardDto" alias="board" />
+		<typeAlias type="kr.co.campfire.user.userBoard.dto.UserBoardReplyDto" alias="postReply" />
+		<typeAlias type="kr.co.campfire.user.campSearch.dto.CampSearchDto" alias="campSearch" />
+      	<typeAlias type="kr.co.campfire.user.campInfo.dto.CampInfoDto" alias="campInfo" />
+      	<typeAlias type="kr.co.campfire.user.campInfo.dto.CampInfoFunctionDto" alias="campReply" />
+      	<typeAlias type="kr.co.campfire.user.myList.dto.MyListDto" alias="myList" />
+      	<typeAlias type="kr.co.campfire.user.myList.dto.MyBoardListDto" alias="myBoardList" />
+      	
+      	<typeAlias type="kr.co.campfire.user.trading.dto.Trading" alias="Trading" />
+		<typeAlias type="kr.co.campfire.user.trading.dto.Category" alias="Category" />
+		<typeAlias type="kr.co.campfire.user.trading.dto.Region" alias="Region" />
+		<typeAlias type="kr.co.campfire.user.trading.dto.File" alias="File" />
+		<typeAlias type="kr.co.campfire.user.trading.dto.Member" alias="Member" />
+		
+		<!-- Business -->
+		<typeAlias type="kr.co.campfire.business.registration.dto.BusinessRegistrationDto" alias="businessRegistration" />
+		<typeAlias type="kr.co.campfire.business.registration.dto.CampRegistrationDto" alias="campRegistration" />
+		<typeAlias type="kr.co.campfire.business.registration.dto.CampRegistrationPhotoDto" alias="campRegistrationPhoto" />
+		<typeAlias type="kr.co.campfire.business.registration.dto.CampRegistrationAmenityDto" alias="campRegistrationAmenity" />
+		<typeAlias type="kr.co.campfire.business.registration.dto.CampRegistrationTagDto" alias="campRegistrationTag" />
+		
+		<!-- Admin -->
+		<typeAlias type="kr.co.campfire.admin.inquiry.dto.AdminInquiryDto" alias="answer" />
+		<typeAlias type="kr.co.campfire.admin.registration.dto.AdminBusinessRegistrationDto" alias="adminBusinessRegistration" />
+		<typeAlias type="kr.co.campfire.admin.registration.dto.AdminCampRegistrationDto" alias="adminCampRegistration" />
+		<typeAlias type="kr.co.campfire.admin.registration.dto.AdminCampRegistrationPhotoDto" alias="adminCampRegistrationPhoto" />
+		<typeAlias type="kr.co.campfire.admin.registration.dto.AdminCampRegistrationAmenityDto" alias="adminCampRegistrationAmenity" />
+		<typeAlias type="kr.co.campfire.admin.registration.dto.AdminCampRegistrationTagDto" alias="adminCampRegistrationTag" />
+		<!-- Common -->
+		<typeAlias type="kr.co.campfire.user.userInquiry.dto.UserInquiryDto" alias="inquiry" />
+		
+		
+		<typeAlias type="kr.co.campfire.chat.model.dto.ChatRoom" alias="ChatRoom" />
+		<typeAlias type="kr.co.campfire.chat.model.dto.ChatMessage" alias="ChatMessage" />
+		<typeAlias type="kr.co.campfire.chat.model.dto.ChatMessage2" alias="ChatMessage2" />
+		
+		<!-- <typeAlias type="kr.co.campfire.user.dto.userDto" alias="user" /> -->
+<!-- 		<typeAlias type="kr.co.greenart.board.model.dto.Board" alias="board" />
+		<typeAlias type="kr.co.greenart.free.model.dto.Free" alias="free" /> -->
+	</typeAliases>
+
+	<mappers>
+	<!-- 로그인,회원가입 -->
+		<mapper resource="/mappers/member/member-mapper.xml" />
+	
+		<!-- User -->
+		<mapper resource="/mappers/user/campSearch-mapper.xml" />
+   		<mapper resource="/mappers/user/campInfo-mapper.xml" />
+		<mapper resource="/mappers/user/board-mapper.xml" />
+		<mapper resource="/mappers/user/trading-mapper.xml" />
+		<mapper resource="/mappers/user/myList-mapper.xml" />
+		
+		<!-- Business -->
+		<mapper resource="/mappers/business/registration-mapper.xml" />
+		
+		<!-- Admin -->
+		<mapper resource="/mappers/admin/answer-mapper.xml" />
+		<mapper resource="/mappers/admin/adminRegistration-mapper.xml" />
+		
+		<!-- Common -->
+		<mapper resource="/mappers/common/inquiry-mapper.xml" />
+		
+		<mapper resource="/mappers/chat/chat-mapper.xml" />
+		
+		<!-- <mapper resource="/mappers/user/user-mapper.xml" /> -->
+<!-- 		<mapper resource="/mappers/board/board-mapper.xml" />
+		<mapper resource="/mappers/free/free-mapper.xml" /> -->
+	</mappers>
+</configuration>

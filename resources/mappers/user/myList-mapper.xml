@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+
+<mapper namespace="myListMapper">
+	<resultMap type="myList" id="myListResultSet">
+		<result column="C_NUM" property="campNum"></result>
+		<result column="M_NUM" property="memberNum"></result>
+		<result column="C_NAME" property="campName"></result>
+		<result column="C_POSTCODE" property="campPostCode"></result>
+		<result column="C_TYPE" property="campType"></result>
+		<result column="C_APLACE" property="campAPlace"></result>
+		<result column="C_MAP_X" property="campX"></result>
+		<result column="C_MAP_Y" property="campY"></result>
+		<result column="C_CHECK" property="campCheck"></result>
+		<result column="C_VIEW" property="campView"></result>
+		<result column="C_LIKE" property="likeCamp"></result>
+		<result column="CAMP_WISHLIST" property="wishList"></result>
+		<result column="C_ADDR" property="campAddress"></result>
+		<result column="CA_AMENITY" property="campAmenity"></result>
+		<result column="CT_TAG" property="campTag"></result>
+		<result column="C_LAST" property="campLastUpdate"></result>
+		<result column="C_FIRST" property="campFirstUpdate"></result>
+		<result column="C_PHONENUM" property="campPhoneNum"></result>
+		<result column="C_CREATE_DATE" property="campCreateDate"></result>
+	</resultMap>
+	
+	<resultMap type="myBoardList" id="myBoardListResultSet">
+		<result column="P_NUM" property="postNum"></result>
+		<result column="M_NUM" property="memberNum"></result>
+		<result column="M_USER_ID" property="memberId"></result>
+		<result column="P_CATEGORY" property="postCategory"></result>
+		<result column="P_DATETIME_CREATED" property="postCreateDate"></result>
+		<result column="P_TITLE" property="postTitle"></result>
+		<result column="P_CONTENT" property="postContent"></result>
+		<result column="P_VIEW_COUNT" property="postViewCount"></result>
+	</resultMap>
+	<select id="selectMyLikeList" resultMap="myListResultSet">
+
+		SELECT * FROM CAMP_INFO ci
+		LEFT JOIN CAMP_LIKE cl ON ci.C_NUM = cl.C_NUM
+		WHERE cl.M_NUM = #{memberNum}
+	</select>
+	<select id="selectMyLikeBoardList" resultMap="myBoardListResultSet">
+
+		SELECT * FROM post
+		LEFT JOIN post_LIKE ON post.p_NUM = post_like.p_NUM
+		JOIN MEMBER ON post.m_NUM = MEMBER.m_num
+		WHERE post_like.M_NUM = #{memberNum}
+	</select>
+	<select id="selectWishList" resultMap="myListResultSet">
+
+		SELECT * FROM CAMP_INFO ci
+		LEFT JOIN CAMP_WISHLIST cw ON ci.C_NUM = cw.C_NUM
+		WHERE cw.M_NUM = #{memberNum}
+	</select>
+
+
+	<select id="selectMyLikeListCount" resultType="_int">
+		SELECT count(*) FROM CAMP_INFO ci
+		LEFT JOIN CAMP_LIKE cl ON ci.C_NUM =
+		cl.C_NUM
+		WHERE cl.M_NUM = #{memberNum}
+	</select>
+	<select id="selectMyLikeBoardListCount" resultType="_int">
+		SELECT count(*) FROM post
+		INNER JOIN MEMBER ON POST.P_NUM = MEMBER.M_NUM
+		LEFT JOIN post_LIKE ON post.p_NUM = post_like.p_NUM
+		WHERE post_like.M_NUM = #{memberNum}
+	</select>
+	<select id="selectMyWishListCount" resultType="_int">
+		SELECT count(*)
+		FROM CAMP_INFO ci
+		LEFT JOIN CAMP_WISHLIST cw ON ci.C_NUM = cw.C_NUM
+		WHERE cw.M_NUM = #{memberNum}
+	</select>
+
+
+</mapper>

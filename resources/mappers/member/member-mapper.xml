@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="memberMapper">
+	<resultMap type="login" id="memberResultSet">
+		<result column="m_num" property="memberNum"></result>
+		<result column="m_user_id" property="memberUserId"></result>
+		<result column="m_pw" property="memberPw"></result>
+		<result column="m_name" property="memberName"></result>
+		<result column="m_gender" property="memberGender"></result>
+		<result column="m_postalcode" property="memberPostalcode"></result>
+		<result column="m_add1" property="memberAdd1"></result>
+		<result column="m_add2" property="memberAdd2"></result>
+		<result column="m_date_birth" property="memberDateBirth"></result>
+		<result column="m_datetime_created"
+			property="memberDatetimeCreated"></result>
+		<result column="m_google" property="memberGoogle"></result>
+		<result column="m_kakao" property="memberKakao"></result>
+		<result column="m_naver" property="memberNaver"></result>
+		<result column="m_division" property="memberDivision"></result>
+
+
+	</resultMap>
+
+	<select id="loginMember" resultMap="memberResultSet">
+		SELECT * FROM MEMBER
+		WHERE M_USER_ID = #{memberUserId}
+		<!-- AND M_REMOVE_DATE IS NULL -->
+	</select>
+	<select id="checkId" resultType="_int">
+		SELECT COUNT(*) FROM MEMBER
+		WHERE M_USER_ID = #{id}
+	</select>
+	<insert id="kakaoSingup">
+		INSERT INTO MEMBER (M_USER_ID, M_PW, M_NAME,
+		M_GENDER, M_KAKAO, M_DIVISION) VALUES (#{memberUserId}, #{memberPw},
+		#{memberName}, #{memberGender}, #{memberKakao}, 'user')
+	</insert>
+	<insert id="naverSingup">
+		INSERT INTO MEMBER (M_USER_ID, M_PW, M_NAME,
+		M_GENDER, M_NAVER, M_DIVISION) VALUES (#{memberUserId}, #{memberPw},
+		#{memberName}, #{memberGender}, #{memberNaver}, 'user')
+	</insert>
+	<insert id="googleSingup">
+		INSERT INTO MEMBER (M_USER_ID, M_PW, M_NAME,
+		M_GENDER, M_GOOGLE, M_DIVISION) VALUES (#{memberUserId}, #{memberPw},
+		#{memberName}, #{memberGender}, #{memberGoogle}, 'user')
+	</insert>
+
+
+	<!-- 회원가입 -->
+	<insert id="signupMember" parameterType="login">
+		INSERT INTO member(m_num,
+		m_user_id,
+		m_pw,
+		m_name,
+		m_postalcode,
+		m_add1,
+		m_add2,
+		m_gender,
+		m_date_birth,
+		m_datetime_created,
+		m_division
+		)
+		VALUES (m_num_seq.nextval,
+		#{memberUserId},
+		#{memberPw},
+		#{memberName},
+		#{memberPostalcode},
+		#{memberAdd1},
+		#{memberAdd2},
+		#{memberGender},
+		#{memberDateBirth},
+		SYSDATE,
+		#{memberDivision}
+		)
+	</insert>
+
+	<!-- 아이디 중복 체크 -->
+	<select id="idCheck" resultMap="memberResultSet">
+		SELECT * FROM member
+		where m_user_id=#{memberUserId}
+	</select>
+
+
+	<!-- 회원정보 보기 -->
+	<select id="readMember" resultMap="memberResultSet">
+		SELECT * FROM member
+		WHERE m_num = #{memberNum}
+	</select>
+
+	<!-- 비밀번호 변경정보 보기 -->
+	<select id="pwupread" resultMap="memberResultSet">
+		SELECT * FROM member
+		WHERE m_num = #{memberNum}
+	</select>
+
+	<!-- 비밀번호 변경 -->
+	<update id="pwup" parameterType="login">
+		UPDATE MEMBER SET
+		m_pw = #{memberPw}
+		WHERE m_num = #{memberNum}
+	</update>
+
+
+	<!-- 회원수정정보 보기 -->
+	<select id="mypageupread" resultMap="memberResultSet">
+		SELECT * FROM member
+		WHERE m_num = #{memberNum}
+	</select>
+
+	<!-- 회원정보 수정 -->
+	<update id="mypageup" parameterType="login">
+		UPDATE MEMBER SET
+		m_name =
+		#{memberName},
+		m_postalcode = #{memberPostalcode},
+		m_add1 =
+		#{memberAdd1},
+		m_add2 = #{memberAdd2},
+		m_gender = #{memberGender},
+		m_date_birth = #{memberDateBirth}
+		WHERE m_num = #{memberNum}
+	</update>
+
+
+
+	<!-- 아이디 찾기 -->
+	<select id="find_id" parameterType="String" resultType="String">
+		SELECT m_user_id FROM member
+		WHERE m_name = #{memberName}
+		and
+		m_date_birth = #{memberDateBirth}
+	</select>
+
+	<!-- 비밀번호 찾기 -->
+	<select id="find_pw" parameterType="String" resultType="String">
+		SELECT m_pw FROM member
+		WHERE m_user_id = #{memberUserId}
+		and
+		m_name = #{memberName}
+	</select>
+	<!-- 회원탈퇴 -->
+<delete id="memberDelete">
+	DELETE FROM member
+	WHERE m_user_id = #{memberUserId}
+	  AND m_pw = #{memberPw} 
+</delete>
+<select id="selectMemberPw" resultType="String">
+	select m_pw from member where m_num = #{memberNum}
+</select>
+</mapper>

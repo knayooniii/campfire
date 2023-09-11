@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="campInfoMapper">
+	<resultMap type="campInfo" id="campInfoResultSet">
+		<result column="C_NUM" property="campNum"></result>
+		<result column="M_NUM" property="memberNum"></result>
+		<result column="C_NAME" property="campName"></result>
+		<result column="C_POSTCODE" property="campPostCode"></result>
+		<result column="C_ADDR" property="campAddr"></result>
+		<result column="C_TYPE" property="campType"></result>
+		<result column="C_APLACE" property="campAPlace"></result>
+		<result column="C_LINK" property="campLink"></result>
+		<result column="C_MAP_X" property="campX"></result>
+		<result column="C_MAP_Y" property="campY"></result>
+		<result column="C_CHECK" property="campCheck"></result>
+		<result column="C_PHONENUM" property="campPhoneNum"></result>
+		<result column="C_CREATE_DATE" property="campCreateDate"></result>
+		<result column="CA_AME_NAME" property="campAmenityName"></result>
+		<result column="CA_AMENITY" property="campAmenity"></result>
+		<result column="CT_TAG" property="campTag"></result>
+		<result column="C_VIEW" property="campView"></result>
+		<result column="C_LIKE" property="campLike"></result>
+		<result column="C_INTRO" property="campIntro"></result>
+		<result column="C_OFFSD_PRICE" property="campOffsdPrice"></result>
+		<result column="C_OFFSW_PRICE" property="campOffswPrice"></result>
+		<result column="C_SD_PRICE" property="campSdPrice"></result>
+		<result column="C_Sw_PRICE" property="campSwPrice"></result>
+		
+
+
+
+		<!-- <result column="CR_CONTENT" property="campReviewContent"></result> 
+			<result column="CR_COMMENTDATE" property="campReviewCommentDate"></result> -->
+	</resultMap>
+
+	<resultMap type="campInfo" id="campTag">
+		<result column="CT_TAG" property="campTag"></result>
+	</resultMap>
+	
+	<resultMap type="campInfo" id="campAmenity">
+		<result column="CA_AMENITY" property="campAmenity"></result>
+		<result column="CA_AME_NAME" property="campAmenityName"></result>
+	</resultMap>
+	
+		<resultMap type="campInfo" id="campPhoto">
+		
+		<result column="CP_NAME" property="campPhotoName"></result>
+		<result column="CP_URL" property="campPhotoURL"></result>
+	</resultMap>
+
+   <resultMap type="campReply" id="postReplyResulySet">
+      <result column="CR_NUM" property="postReplyNum"></result>
+      <result column="C_NUM" property="campNum"></result>
+      <result column="M_NUM" property="memberNum"></result>
+      <result column="M_USER_ID" property="memberId"></result>
+      <result column="CR_CONTENT" property="postReplyContent"></result>
+      <result column="CR_COMMENTDATE" property="postReplyCreateDate"></result>
+   </resultMap>
+   
+	<select id="CampInfo" resultMap="campInfoResultSet">
+		SELECT * FROM CAMP_INFO WHERE
+		C_NUM = #{campNum}
+	</select>
+	<update id="countCampInfo" parameterType="campInfo">
+		UPDATE CAMP_INFO SET C_VIEW = #{campView} WHERE C_NUM = #{campNum}
+	</update>
+
+	<select id="CampTag" resultMap="campTag">
+		SELECT CT_TAG FROM CAMP_TAG WHERE C_NUM = #{campNum}
+	</select>
+	<select id="CampAmenity" resultMap="campAmenity">
+		SELECT CA_AMENITY, CA_AME_NAME FROM CAMP_AMENITY WHERE C_NUM = #{campNum}
+	</select>
+	<select id="campPhoto" resultMap="campPhoto">
+		SELECT CP_URL, CP_NAME,
+		CP_DATETIME_CREATED FROM CAMP_PHOTO WHERE C_NUM = #{campNum}
+	</select>
+
+	
+	
+<!-- 게시물 좋아요 수 체크 -->
+   <select id="selectLikeCount" resultType="_int">
+      SELECT COUNT(*) FROM CAMP_LIKE WHERE C_NUM = #{campNum}
+   </select>
+   
+   <!--  게시물 좋아요 했는지 안했는제 체크-->
+   <select id="selectCheckLike" resultType="_int">
+      SELECT COUNT(*) FROM CAMP_LIKE WHERE C_NUM = #{campNum} AND M_NUM = #{memberNum}
+   </select>
+   
+   <!--좋아요 추가 -->
+   <insert id="likeCamp">
+      INSERT INTO CAMP_LIKE (m_num, c_num) VALUES (#{memberNum}, #{campNum})
+   </insert>
+   
+   <!--좋아요 삭제 -->
+   <delete id="unlikeCamp">
+      DELETE FROM CAMP_LIKE WHERE M_NUM = #{memberNum} AND C_NUM = #{campNum}
+   </delete>
+   
+  
+  <!-- 즐찾 수 체크 -->
+   <select id="selectWishlistCount" resultType="_int">
+      SELECT COUNT(*) FROM CAMP_WISHLIST WHERE C_NUM = #{campNum}
+   </select>
+   
+   <!--  즐칮 했는지 안했는제 체크-->
+   <select id="selectCheckWishlist" resultType="_int">
+      SELECT COUNT(*) FROM CAMP_WISHLIST WHERE C_NUM = #{campNum} AND M_NUM = #{memberNum}
+   </select>
+   
+   <!-- 즐찾 -->
+   <insert id="wishlist">
+      INSERT INTO CAMP_WISHLIST (m_num, c_num) VALUES (#{memberNum}, #{campNum})
+   </insert>
+   
+   <!-- 즐찾 삭제 -->
+   <delete id="unwishlist">
+      DELETE FROM CAMP_WISHLIST WHERE M_NUM = #{memberNum} AND C_NUM = #{campNum}
+   </delete>
+   
+      <!-- 댓글 리스트 -->
+   <select id="selectPostReply" resultMap="postReplyResulySet">
+      SELECT * FROM CAMP_REVIEW 
+      INNER JOIN MEMBER ON CAMP_REVIEW.M_NUM = MEMBER.M_NUM
+      WHERE CAMP_REVIEW.C_NUM = #{campNum} ORDER BY CAMP_REVIEW.CR_COMMENTDATE
+   </select>
+   
+   <!--댓글 추가 -->
+   <insert id="insertReply">
+      INSERT INTO CAMP_REVIEW (c_num, m_num, cr_content) VALUES (#{campNum}, #{memberNum}, #{postReplyContent})
+   </insert>
+   
+   <select id="selectReplyOne" resultMap="postReplyResulySet">
+      SELECT *
+      FROM CAMP_REVIEW
+      INNER JOIN MEMBER ON CAMP_REVIEW.M_NUM = MEMBER.M_NUM
+      WHERE CAMP_REVIEW.cr_content = #{postReplyContent}
+      ORDER BY CAMP_REVIEW.CR_COMMENTDATE DESC
+   </select>
+
+   <!--  댓글 좋아요 했는지 안했는제 체크-->
+   <select id="selectReplyCheckLike" resultType="_int">
+      SELECT COUNT(*) FROM CAMP_REVIEW_LIKE WHERE CR_NUM = #{postReplyNum} AND M_NUM = #{memberNum}
+   </select>
+   <select id="selectReplyLikeCount" resultType="_int">
+      SELECT COUNT(*) FROM CAMP_REVIEW_LIKE WHERE CR_NUM = #{postReplyNum}
+   </select>
+   
+      <!--좋아요 추가 -->
+   <insert id="replyLikePost">
+      INSERT INTO CAMP_REVIEW_LIKE (m_num, cr_num) VALUES (#{memberNum}, #{postReplyNum})
+   </insert>
+   
+   <!--좋아요 삭제 -->
+   <delete id="replyUnlikePost">
+      DELETE FROM CAMP_REVIEW_LIKE WHERE M_NUM = #{memberNum} AND CR_NUM = #{postReplyNum}
+   </delete>
+   
+   <!-- 댓글삭제 -->
+      <delete id="deleteReply">
+      DELETE FROM CAMP_REVIEW WHERE CR_NUM = #{postReplyNum}
+   </delete>
+</mapper>

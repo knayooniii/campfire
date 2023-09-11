@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="answerMapper">
+	<resultMap type="answer" id="answerResultSet">
+		<result column="IN_NUM" property="inquiryNum"></result>
+		<result column="M_NUM" property="memberNum"></result>
+		<result column="M_USER_ID" property="memberId"></result>
+		<result column="IN_TITLE" property="inquiryTitle"></result>
+		<result column="IN_CONTEXT" property="inquiryContext"></result>
+		<result column="IN_DATETIME_CREATED"
+			property="inquiryDateTimeCreated"></result>
+		<result column="IN_ANSWER_FL" property="inquiryAnswerFL"></result>
+		<result column="IN_PUBLIC_FL" property="inquiryPublicFL"></result>
+		<result column="IN_A_ADMIN" property="answerAdmin"></result>
+		<result column="IN_A_TITLE" property="answerTitle"></result>
+		<result column="IN_A_CONTEXT" property="answerContext"></result>
+		<result column="IN_A_DATETIME_CREATED"
+			property="answerDateTimeCreated"></result>
+	</resultMap>
+
+
+	<select id="selectNoAnswerListCount" resultType="_int">
+		SELECT COUNT(*)
+		FROM inquiry
+		WHERE IN_ANSWER_FL = 'N'
+	</select>
+
+	<select id="selectNoAnswerList" resultMap="answerResultSet">
+		SELECT * FROM inquiry
+		INNER JOIN MEMBER ON inquiry.M_NUM = MEMBER.M_NUM
+		LEFT
+		OUTER JOIN INQUIRY_ANSWER ON inquiry.in_NUM = INQUIRY_ANSWER.in_NUM
+		WHERE
+		IN_ANSWER_FL ='N'
+		ORDER BY IN_DATETIME_CREATED DESC, inquiry.IN_NUM DESC
+	</select>
+
+	<select id="selectAllAnswerListCount" resultType="_int">
+		SELECT COUNT(*)
+		FROM inquiry
+	</select>
+
+	<select id="selectAllAnswerList" resultMap="answerResultSet">
+		SELECT * FROM inquiry
+		INNER JOIN MEMBER ON inquiry.M_NUM = MEMBER.M_NUM
+		LEFT OUTER JOIN INQUIRY_ANSWER ON inquiry.in_NUM = INQUIRY_ANSWER.in_NUM
+		ORDER BY IN_DATETIME_CREATED DESC, inquiry.IN_NUM DESC
+	</select>
+
+	<select id="detailInquiry" resultMap="answerResultSet">
+		SELECT inquiry.*, INQUIRY_ANSWER.*, MEMBER.M_USER_ID FROM inquiry
+		LEFT OUTER JOIN INQUIRY_ANSWER ON inquiry.in_NUM = INQUIRY_ANSWER.in_NUM
+		LEFT OUTER JOIN MEMBER ON inquiry.M_NUM = MEMBER.M_NUM
+		WHERE inquiry.in_NUM = #{inNum}
+	</select>
+
+	<insert id="insertAnswer">
+		INSERT INTO inquiry_answer(IN_NUM, IN_A_TITLE,
+		IN_A_CONTEXT, IN_A_ADMIN )
+		VALUES(#{inquiryNum}, #{answerTitle},
+		#{answerContext},
+		#{answerAdmin})
+	</insert>
+
+	<delete id="deleteInquiry">
+		DELETE FROM inquiry WHERE in_num = #{inquiryNum}
+	</delete>
+
+	<delete id="deleteAnswer">
+		DELETE FROM inquiry_answer WHERE in_num =
+		#{inquiryNum}
+	</delete>
+
+	<update id="updateInquiryIA" parameterType="int">
+		UPDATE inquiry SET
+		IN_ANSWER_FL = 'Y'
+		WHERE IN_NUM = #{inquiryNum}
+	</update>
+		<update id="updateInquiryDA" parameterType="int">
+		UPDATE inquiry SET
+		IN_ANSWER_FL = 'N'
+		WHERE IN_NUM = #{inquiryNum}
+	</update>
+	<!-- <select id="checkBusiness" resultMap="businessRegistrationResultSet"> 
+		SELECT * FROM Business_Registration WHERE M_NUM = #{mNum} </select> -->
+
+	<!-- <select id="checkRegistration" resultType="_int"> SELECT COUNT(*) FROM 
+		CAMP_INFO WHERE M_NUM = #{mNum} </select> -->
+	<!-- <select id="checkEmail" resultType="_int"> SELECT COUNT(*) FROM M_MEMBER 
+		WHERE M_EMAIL = #{email} </select> -->
+
+	<!-- <insert id="singupMember" parameterType="member"> INSERT INTO M_MEMBER(M_IDX, 
+		M_EMAIL, M_NAME, M_PASSWORD, M_INDATE, M_REMOVE_DATE) VALUES (M_SEQ.NEXTVAL, 
+		#{memberEmail}, #{memberName}, #{memberPassword},SYSDATE, NULL) </insert> -->
+</mapper>

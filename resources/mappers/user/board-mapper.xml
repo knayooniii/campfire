@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="boardMapper">
+	<resultMap type="board" id="boardResultSet">
+		<result column="P_NUM" property="postNum"></result>
+		<result column="M_NUM" property="memberNum"></result>
+		<result column="M_USER_ID" property="memberId"></result>
+		<result column="P_CATEGORY" property="postCategory"></result>
+		<result column="P_DATETIME_CREATED" property="postCreateDate"></result>
+		<result column="P_TITLE" property="postTitle"></result>
+		<result column="P_CONTENT" property="postContent"></result>
+		<result column="P_VIEW_COUNT" property="postViewCount"></result>
+	</resultMap>
+
+	<resultMap type="postReply" id="postReplyResulySet">
+		<result column="PR_NUM" property="postReplyNum"></result>
+		<result column="P_NUM" property="postNum"></result>
+		<result column="M_NUM" property="memberNum"></result>
+		<result column="M_USER_ID" property="memberId"></result>
+		<result column="PR_CONTENT" property="postReplyContent"></result>
+		<result column="PR_DATETIME_CREATED" property="postReplyCreateDate"></result>
+	</resultMap>
+
+	<insert id="insertBoard">
+		INSERT INTO POST (M_NUM, P_CATEGORY,
+		P_TITLE, P_CONTENT)
+		VALUES (#{memberNum}, #{postCategory}, #{postTitle}, #{postContent})
+	</insert>
+
+
+
+	<select id="selectListAllCount" resultType="_int">
+		SELECT COUNT(*) FROM post WHERE P_CATEGORY = #{postCategory}
+	</select>
+
+	<select id="selectListTitleCount" resultType="_int">
+		SELECT COUNT(*) FROM post
+		WHERE P_TITLE LIKE '%'||#{searchTxt}||'%' AND P_CATEGORY = #{postCategory}
+	</select>
+
+	<select id="selectListContextCount" resultType="_int">
+		SELECT COUNT(*) FROM post
+		WHERE P_CONTENT LIKE '%'||#{searchTxt}||'%'AND P_CATEGORY = #{postCategory}
+	</select>
+
+	<select id="selectListWriterCount" resultType="_int">
+		SELECT COUNT(*) FROM POST
+		INNER JOIN MEMBER ON POST.M_NUM = MEMBER.M_NUM
+		WHERE MEMBER.M_USER_ID LIKE '%'||#{searchTxt}||'%' AND PSOT.P_CATEGORY = #{postCategory}
+	</select>
+	
+	
+	<select id="selectListPopular" resultMap="boardResultSet">
+		SELECT * FROM POST
+		INNER JOIN MEMBER ON post.M_NUM = MEMBER.M_NUM WHERE POST.P_CATEGORY = #{postCategory}
+		ORDER BY POST.P_VIEW_COUNT DESC
+	</select>
+	
+	<select id="selectListAll" resultMap="boardResultSet">
+		SELECT * FROM POST
+		INNER JOIN MEMBER ON post.M_NUM = MEMBER.M_NUM WHERE POST.P_CATEGORY = #{postCategory}
+		ORDER BY POST.P_DATETIME_CREATED DESC, POST.P_NUM DESC
+	</select>
+
+	<select id="selectListTitle" resultMap="boardResultSet">
+		SELECT * FROM POST
+		INNER JOIN MEMBER ON post.M_NUM = MEMBER.M_NUM 
+		WHERE POST.P_TITLE LIKE '%'||#{searchTxt}||'%' AND POST.P_CATEGORY = #{postCategory}
+		ORDER BY POST.P_DATETIME_CREATED DESC, POST.P_NUM DESC
+	</select>
+
+	<select id="selectListContext" resultMap="boardResultSet">
+		SELECT * FROM POST
+		INNER JOIN MEMBER ON post.M_NUM = MEMBER.M_NUM 
+		WHERE POST.P_CONTENT LIKE '%'||#{searchTxt}||'%' AND POST.P_CATEGORY = #{postCategory}
+		ORDER BY POST.P_DATETIME_CREATED DESC, POST.P_NUM DESC
+	</select>
+
+	<select id="selectListWriter" resultMap="boardResultSet">
+		SELECT * FROM POST
+		INNER JOIN MEMBER ON POST.P_NUM = MEMBER.M_NUM
+		WHERE MEMBER.M_USER_ID LIKE '%'||#{searchTxt}||'%' AND P_CATEGORY = #{postCategory}
+		ORDER BY P_DATETIME_CREATED DESC, POST.P_NUM DESC
+	</select>
+	
+	<select id="selectPost" resultMap="boardResultSet">
+		SELECT * FROM POST
+		INNER JOIN MEMBER ON post.M_NUM = MEMBER.M_NUM 
+		WHERE post.P_NUM = #{postNum}
+	</select>
+	
+	<update id="updateViewCount">
+		UPDATE post SET p_view_count = #{postViewCount} WHERE p_num = #{postNum}
+	</update>
+	
+	<delete id="deleteBoard">
+		DELETE FROM POST WHERE P_NUM = #{postNum}
+	</delete>
+	
+	<update id="updateBoard">
+		UPDATE POST SET P_TITLE =#{postTitle}, P_CONTENT = #{postContent}, P_CATEGORY = #{postCategory} where p_num = #{postNum} 
+	</update>
+	
+	<!-- 게시물 좋아요 수 체크 -->
+	<select id="selectLikeCount" resultType="_int">
+		SELECT COUNT(*) FROM POST_LIKE WHERE P_NUM = #{postNum}
+	</select>
+	
+	<!--  게시물 좋아요 했는지 안했는제 체크-->
+	<select id="selectCheckLike" resultType="_int">
+		SELECT COUNT(*) FROM POST_LIKE WHERE P_NUM = #{postNum} AND M_NUM = #{memberNum}
+	</select>
+	
+	<!--좋아요 추가 -->
+	<insert id="likePost">
+		INSERT INTO POST_LIKE (m_num, p_num) VALUES (#{memberNum}, #{postNum})
+	</insert>
+	
+	<!--좋아요 삭제 -->
+	<delete id="unlikePost">
+		DELETE FROM POST_LIKE WHERE M_NUM = #{memberNum} AND P_NUM = #{postNum}
+	</delete>
+	<!-- 댓글 갯수 구하기 -->
+	<select id="selectReplyCount" resultType="_int">
+		SELECT COUNT(*) FROM POST_REPLY WHERE P_NUM = #{postNum}
+	</select>
+	<!-- 댓글 리스트 -->
+	<select id="selectPostReply" resultMap="postReplyResulySet">
+		SELECT * FROM POST_REPLY 
+		INNER JOIN MEMBER ON POST_REPLY.M_NUM = MEMBER.M_NUM
+		WHERE POST_REPLY.P_NUM = #{postNum} ORDER BY POST_REPLY.PR_DATETIME_CREATED
+	</select>
+	
+	<!--댓글 추가 -->
+	<insert id="insertReply">
+		INSERT INTO POST_REPLY (p_num, m_num, pr_content) VALUES (#{postNum}, #{memberNum}, #{postReplyContent})
+	</insert>
+	
+	<select id="selectReplyOne" resultMap="postReplyResulySet">
+		SELECT *
+		FROM POST_REPLY
+		INNER JOIN MEMBER ON POST_REPLY.M_NUM = MEMBER.M_NUM
+		WHERE POST_REPLY.pr_content = #{postReplyContent}
+		ORDER BY POST_REPLY.pr_datetime_created DESC
+	</select>
+
+	<!--  댓글 좋아요 했는지 안했는제 체크-->
+	<select id="selectReplyCheckLike" resultType="_int">
+		SELECT COUNT(*) FROM POST_REPLY_LIKE WHERE PR_NUM = #{postReplyNum} AND M_NUM = #{memberNum}
+	</select>
+	<select id="selectReplyLikeCount" resultType="_int">
+		SELECT COUNT(*) FROM POST_REPLY_LIKE WHERE PR_NUM = #{postReplyNum}
+	</select>
+	
+		<!--좋아요 추가 -->
+	<insert id="replyLikePost">
+		INSERT INTO POST_REPLY_LIKE (m_num, pr_num) VALUES (#{memberNum}, #{postReplyNum})
+	</insert>
+	
+	<!--좋아요 삭제 -->
+	<delete id="replyUnlikePost">
+		DELETE FROM POST_REPLY_LIKE WHERE M_NUM = #{memberNum} AND PR_NUM = #{postReplyNum}
+	</delete>
+	
+	<delete id="deleteReply">
+		DELETE FROM POST_REPLY WHERE PR_NUM = #{postReplyNum}
+	</delete>
+</mapper>

@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tradingMapper">
+
+	<!-- resultMap : DTO랑 똑같음, 근데 얘는 DB 컬럼이랑 DTO와 Mapping 시켜주는 것 -->
+	<resultMap id="tradingResultSet" type="Trading">
+		<result column="SP_NUM" property="idx"></result>
+		<result column="M_NUM" property="memberIdx"></result>
+		<result column="CG_NUM" property="categoryIdx"></result>
+		<result column="R_NUM" property="regionIdx"></result>
+		<result column="SP_TITLE" property="title"></result>
+		<result column="SP_CONTENT" property="content"></result>
+		<result column="SP_PRICE" property="price"></result>
+		<result column="SP_TIMESTAMP" property="createdDate"></result>
+		<result column="SP_IS_SOLD" property="isSold"></result>
+	</resultMap>
+	
+	<resultMap id="categoryResultSet" type="Category">
+		<result column="CG_NUM" property="idx"></result>
+		<result column="CG_NAME_1" property="categoryName1"></result>
+		<result column="CG_NAME_2" property="categoryName2"></result>
+	</resultMap>
+	
+	<resultMap id="regionResultSet" type="Region">
+		<result column="R_NUM" property="idx"></result>
+		<result column="R_NAME_1" property="regionName1"></result>
+		<result column="R_NAME_2" property="regionName2"></result>
+	</resultMap>
+	
+	<resultMap id="fileResultSet" type="File">
+		<result column="SF_NUM" property="idx"></result>
+		<result column="SP_NUM" property="tradingIdx"></result>
+		<result column="SF_ORIGIN_NAME" property="uploadOriginName"></result>
+		<result column="SF_PATH" property="uploadPath"></result> 
+		<result column="SF_NAME" property="uploadName"></result> 
+	</resultMap>
+	
+	<resultMap id="memberResultSet" type="Member">
+		<result column="m_num" property="idx"></result>
+		<result column="m_name" property="name"></result>
+	</resultMap>
+
+	<!-- 전체 게시글 수 구하기  --> 
+	<select id="selectListCount" resultType="int" parameterType="java.util.HashMap">
+    	SELECT COUNT(*)
+	    FROM SECONDHAND_POST sp
+	    JOIN REGION r ON sp.R_NUM = r.R_NUM
+	    JOIN CATEGORY c ON sp.CG_NUM = c.CG_NUM
+	    WHERE r.R_NAME_1 LIKE '%'||#{filterRegion1}||'%'
+	      	AND r.R_NAME_2 LIKE '%'||#{filterRegion2}||'%'
+	      	AND c.CG_NAME_1 LIKE '%'||#{filterCategory1}||'%'
+	      	AND c.CG_NAME_2 LIKE '%'||#{filterCategory2}||'%'
+	      	AND (sp.SP_CONTENT LIKE '%'||#{filterKeyword}||'%'
+	        	OR sp.SP_TITLE LIKE '%'||#{filterKeyword}||'%')
+	      	AND sp.SP_PRICE<![CDATA[>=]]>#{filterMinPrice}
+ 		    AND sp.SP_PRICE<![CDATA[<=]]>#{filterMaxPrice}
+      	ORDER BY sp.SP_NUM DESC
+      	
+	</select>
+	
+	<select id="selectListCountInMember" resultType="int" parameterType="java.util.HashMap">
+    	SELECT COUNT(*)
+	    FROM SECONDHAND_POST sp
+	    JOIN REGION r ON sp.R_NUM = r.R_NUM
+	    JOIN CATEGORY c ON sp.CG_NUM = c.CG_NUM
+	    WHERE r.R_NAME_1 LIKE '%'||#{filterRegion1}||'%'
+	      	AND r.R_NAME_2 LIKE '%'||#{filterRegion2}||'%'
+	      	AND c.CG_NAME_1 LIKE '%'||#{filterCategory1}||'%'
+	      	AND c.CG_NAME_2 LIKE '%'||#{filterCategory2}||'%'
+	      	AND (sp.SP_CONTENT LIKE '%'||#{filterKeyword}||'%'
+	        	OR sp.SP_TITLE LIKE '%'||#{filterKeyword}||'%')
+	      	AND sp.SP_PRICE<![CDATA[>=]]>#{filterMinPrice}
+	      	AND sp.SP_PRICE<![CDATA[<=]]>#{filterMaxPrice}
+		    AND sp.M_NUM = #{memberIdx}
+      	ORDER BY sp.SP_NUM DESC
+	</select>
+
+	<!-- 목록 불러오기 -->
+	<select id="selectListAll" resultMap="tradingResultSet" parameterType="java.util.HashMap">
+		SELECT b.* FROM (
+			SELECT ROWNUM AS RN, a.*
+			FROM (
+				SELECT *
+				FROM SECONDHAND_POST sp
+				JOIN REGION r ON sp.R_NUM = r.R_NUM
+				JOIN CATEGORY c ON sp.CG_NUM = c.CG_NUM
+				WHERE r.R_NAME_1 LIKE '%'||#{filterRegion1}||'%'
+					AND r.R_NAME_2 LIKE '%'||#{filterRegion2}||'%'
+					AND c.CG_NAME_1 LIKE '%'||#{filterCategory1}||'%'
+					AND c.CG_NAME_2 LIKE '%'||#{filterCategory2}||'%'
+					AND (sp.SP_CONTENT LIKE '%'||#{filterKeyword}||'%'
+						OR sp.SP_TITLE LIKE '%'||#{filterKeyword}||'%')
+					AND sp.SP_PRICE<![CDATA[>=]]>#{filterMinPrice}
+					AND sp.SP_PRICE<![CDATA[<=]]>#{filterMaxPrice}
+				ORDER BY sp.SP_NUM DESC
+			) a
+			WHERE ROWNUM>='1'
+		) b
+		WHERE b.RN<![CDATA[>=]]>#{startRow}
+			AND b.RN<![CDATA[<=]]>#{endRow}
+	</select>
+	
+	<select id="selectListAllInMember" resultMap="tradingResultSet" parameterType="java.util.HashMap">
+		SELECT b.* FROM (
+			SELECT ROWNUM AS RN, a.*
+			FROM (
+				SELECT *
+				FROM SECONDHAND_POST sp
+				JOIN REGION r ON sp.R_NUM = r.R_NUM
+				JOIN CATEGORY c ON sp.CG_NUM = c.CG_NUM
+				WHERE r.R_NAME_1 LIKE '%'||#{filterRegion1}||'%'
+					AND r.R_NAME_2 LIKE '%'||#{filterRegion2}||'%'
+					AND c.CG_NAME_1 LIKE '%'||#{filterCategory1}||'%'
+					AND c.CG_NAME_2 LIKE '%'||#{filterCategory2}||'%'
+					AND (sp.SP_CONTENT LIKE '%'||#{filterKeyword}||'%'
+						OR sp.SP_TITLE LIKE '%'||#{filterKeyword}||'%')
+					AND sp.SP_PRICE<![CDATA[>=]]>#{filterMinPrice}
+					AND sp.SP_PRICE<![CDATA[<=]]>#{filterMaxPrice}
+					AND sp.M_NUM = #{memberIdx}
+				ORDER BY sp.SP_NUM DESC
+			) a
+			WHERE ROWNUM>='1'
+		) b
+		WHERE b.RN<![CDATA[>=]]>#{startRow}
+			AND b.RN<![CDATA[<=]]>#{endRow}
+	</select>
+	
+	<!-- 파일, 카테고리, 지역 -->
+	<select id="selectFileAll" resultMap="fileResultSet" parameterType="int">
+		SELECT *
+			FROM SECONDHAND_FILE sf
+			WHERE sf.SP_NUM = #{tradingIdx}			
+			ORDER BY sf.SF_NUM ASC
+	</select>
+	
+	<select id="selectCategory" resultMap="categoryResultSet" parameterType="int">
+	SELECT *
+		FROM CATEGORY cg
+		WHERE cg.CG_NUM = #{categoryIdx}			
+	</select>
+	
+	<select id="selectRegion" resultMap="regionResultSet" parameterType="int">
+	SELECT *
+		FROM REGION r
+		WHERE r.R_NUM = #{regionIdx}			
+	</select>
+
+	<!-- 카테고리, 지역 idx-->
+		<select id="selectCategoryIdx" resultType="int" parameterType="java.util.HashMap">
+	SELECT CG_NUM
+		FROM CATEGORY cg
+		WHERE cg.CG_NAME_1 = #{category1}		
+			AND cg.CG_NAME_2 = #{category2}
+	</select>
+	
+	<select id="selectRegionIdx" resultType="int" parameterType="java.util.HashMap">
+	SELECT R_NUM
+		FROM REGION r
+		WHERE r.R_NAME_1 = #{region1}		
+			AND r.R_NAME_2 = #{region2}		
+	</select>
+
+	<!-- detail -->
+	<select id="selectTrading" resultMap="tradingResultSet" parameterType="int">
+	SELECT *
+		FROM SECONDHAND_POST sp
+		WHERE sp.SP_NUM = #{tradingIdx}			
+	</select>
+	
+	<select id="selectMember" resultMap="memberResultSet" parameterType="int">
+		SELECT *
+			FROM <![CDATA[member m]]>
+			WHERE <![CDATA[m.m_num]]> = #{memberIdx}
+	</select>
+
+	<!-- 게시글 삽입 -->
+	<insert id="insertTrading" parameterType="Trading">
+	    <selectKey keyProperty="idx" resultType="int" order="BEFORE">
+        	SELECT SP_NUM_SEQ.NEXTVAL FROM DUAL
+    	</selectKey>
+		INSERT INTO
+		SECONDHAND_POST (
+		SP_NUM,
+		M_NUM,
+		CG_NUM,
+		R_NUM,
+		SP_TITLE,
+		SP_CONTENT,
+		SP_PRICE,
+		SP_IS_SOLD
+		) VALUES (
+		#{idx},
+		#{memberIdx},
+		#{categoryIdx},
+		#{regionIdx},
+		#{title},
+		#{content},
+		#{price},
+		#{isSold}
+		)
+	</insert>
+	
+	<insert id="insertFile" parameterType="File">
+		INSERT INTO
+		SECONDHAND_FILE (
+		SF_NUM,
+		SP_NUM,
+		SF_ORIGIN_NAME,
+		SF_PATH,
+		SF_NAME
+		) VALUES (
+		SF_NUM_SEQ.NEXTVAL,
+		#{tradingIdx},
+		#{uploadOriginName},
+		#{uploadPath},
+		#{uploadName}
+		)
+	</insert>
+
+	<!-- 게시글 상세보기 (내용 보기) -->
+	<select id="detailTrading" resultMap="tradingResultSet">
+		SELECT * FROM
+		SECONDHAND_POST
+		WHERE
+		SP_NUM = #{idx}
+	</select>
+	
+	<select id="detailCategory" resultMap="categoryResultSet">
+		SELECT * FROM
+		CATEGORY
+		WHERE
+		CG_NUM = #{tradingIdx}
+	</select>
+	
+	<select id="detailRegion" resultMap="regionResultSet">
+		SELECT * FROM
+		CATEGORY
+		WHERE
+		R_NUM = #{tradingIdx}
+	</select>
+	
+	<select id="detailFile" resultMap="fileResultSet">
+		SELECT * FROM
+		SECONDHAND_FILE
+		WHERE
+		SP_NUM = #{tradingIdx}
+	</select>
+
+	<!-- 조회수 +1 -->
+	<!-- <update id="incrementCount" parameterType="int">
+		UPDATE BOARD SET B_COUNT 
+		= B_COUNT + 1 WHERE B_IDX = #{idx}
+	</update> -->
+
+	<!-- 게시글 수정 -->
+	<update id="updateTrading" parameterType="Trading">
+		UPDATE SECONDHAND_POST
+		SET
+			CG_NUM = #{categoryIdx},
+			R_NUM = #{regionIdx},
+			SP_TITLE = #{title},
+			SP_CONTENT = #{content},
+			SP_PRICE = #{price}
+		WHERE
+    		SP_NUM = #{idx}
+	</update>
+	
+	<select id="selectFileIndexes" resultType="Integer">
+		SELECT SF_NUM FROM
+		SECONDHAND_FILE
+		WHERE
+		SP_NUM = #{tradingIdx}
+	</select>
+	
+	<!-- <update id="updateFile" parameterType="File">
+		UPDATE SECONDHAND_FILE
+		~
+	</update> -->
+
+	<!-- 게시글 삭제 -->
+	<delete id="deleteTrading" parameterType="int">
+		DELETE FROM
+		SECONDHAND_POST
+		WHERE
+		SP_NUM = #{idx}
+	</delete>
+	
+	<delete id="deleteFiles" parameterType="int">
+		DELETE FROM
+		SECONDHAND_FILE
+		WHERE
+		SP_NUM = #{tradingIdx}
+	</delete>
+	
+	<delete id="deleteFile" parameterType="int">
+		DELETE FROM
+		SECONDHAND_FILE
+		WHERE
+		SF_NUM = #{fileIdx}
+	</delete>
+
+	<!-- 뒤로가기 버튼 제작 -->
+	<select id="selectDescPositionOnPost" resultType="int" parameterType="int">
+		SELECT COUNT(*) AS Position
+		FROM SECONDHAND_POST
+		WHERE SP_NUM <![CDATA[>=]]> #{tradingIdx}
+	</select>
+
+	<!-- 거래완료 토글 -->
+	<update id="soldToggle" parameterType="Map">
+		UPDATE SECONDHAND_POST
+		SET
+			SP_IS_SOLD = #{tradingSold}
+		WHERE
+    		SP_NUM = #{tradingIdx}
+	</update>
+	
+	<select id="checkSold" resultType="String" parameterType="int">
+		SELECT SP_IS_SOLD
+		FROM SECONDHAND_POST sp
+		WHERE sp.SP_NUM = #{tradingIdx}
+	</select>
+</mapper>

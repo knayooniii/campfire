@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="chatMapper">
+
+	<!-- resultMap : DTO랑 똑같음, 근데 얘는 DB 컬럼이랑 DTO와 Mapping 시켜주는 것 -->
+	<resultMap id="chatRoomResultSet" type="ChatRoom">
+		<result column="CHR_NUM" property="idx"></result>
+		<result column="SP_NUM" property="tradingIdx"></result>
+		<result column="M_NUM" property="memberIdx"></result>
+	</resultMap>
+	
+	<resultMap id="chatMessageResultSet" type="ChatMessage">
+		<result column="CHM_NUM" property="idx"></result>
+		<result column="CHR_NUM" property="chatRoomIdx"></result>
+		<result column="M_NUM" property="memberIdx"></result>
+		<result column="CHM_CONTENT" property="content"></result>
+		<result column="CHM_TIMESTAMP" property="createdDate"></result>
+		<result column="CHM_IS_READ" property="isRead"></result>
+	</resultMap>
+	
+		<resultMap id="chatMessage2ResultSet" type="ChatMessage2">
+		<result column="CHM_NUM" property="idx"></result>
+		<result column="CHR_NUM" property="chatRoomIdx"></result>
+		<result column="M_NUM" property="memberIdx"></result>
+		<result column="CHM_CONTENT" property="content"></result>
+		<result column="CHM_TIMESTAMP" property="createdDate"></result>
+		<result column="CHM_IS_READ" property="isRead"></result>
+		<result column="m_name" property="name"></result>
+	</resultMap>
+	
+	<select id="loadMessages" resultMap="chatMessageResultSet" parameterType="java.util.HashMap">
+    	SELECT *
+	    FROM CHAT_MESSAGE chm
+	    WHERE chm.CHR_NUM = #{chatRoomIdx}
+      	AND chm.CHM_NUM <![CDATA[>]]> #{lastMessageIdx}
+	</select>
+
+	<select id="loadMessages2" resultMap="chatMessage2ResultSet" parameterType="java.util.HashMap">
+	    SELECT
+	    	chm.CHM_NUM,
+	        chm.CHR_NUM,
+	        chm.M_NUM,
+	        chm.CHM_CONTENT,
+	        chm.CHM_TIMESTAMP,
+	        chm.CHM_IS_READ,
+	        m.m_name
+	    FROM
+	        CHAT_MESSAGE chm
+	    JOIN
+	        member m ON chm.M_NUM = m.m_num
+  	    WHERE chm.CHR_NUM = #{chatRoomIdx}
+      		AND chm.CHM_NUM <![CDATA[>]]> #{lastMessageIdx}
+	</select>
+
+
+	<select id="selectChatRoomIdx" resultType="int" parameterType="java.util.HashMap">
+    	SELECT CHR_NUM
+	    FROM CHAT_ROOM chr
+	    WHERE chr.SP_NUM = #{tradingIdx}
+      		AND chr.M_NUM = #{sessionMemberIdx}
+	</select>
+	
+	<select id="selectChatRoomIdxCount" resultType="int" parameterType="java.util.HashMap">
+    	SELECT COUNT(*)
+	    FROM CHAT_ROOM chr
+	    WHERE chr.SP_NUM = #{tradingIdx}
+      		AND chr.M_NUM = #{sessionMemberIdx}
+	</select>
+	
+	<delete id="deleteChatMessages" parameterType="int">
+		DELETE FROM
+		CHAT_MESSAGE
+		WHERE
+		CHR_NUM = #{chatRoomIdx}
+	</delete>
+	
+	<delete id="deleteChatRoom" parameterType="int">
+		DELETE FROM
+		CHAT_ROOM
+		WHERE
+		CHR_NUM = #{chatRoomIdx}
+	</delete>
+
+	<insert id="insertMessage" parameterType="java.util.HashMap">
+		INSERT INTO
+		CHAT_MESSAGE (
+			CHR_NUM,
+			M_NUM,
+			CHM_CONTENT
+		) VALUES (
+			#{chatRoomIdx},
+			#{senderIdx},
+			#{content}
+		)
+	</insert>
+	
+	<insert id="makeChatRoom" parameterType="java.util.HashMap">
+		INSERT INTO
+		CHAT_ROOM (
+			SP_NUM,
+			M_NUM
+		) VALUES (
+			#{tradingIdx},
+			#{sessionMemberIdx}
+		)
+	</insert>
+	
+	<select id="listOfChatRoomIdx" resultType="int" parameterType="int">
+    	SELECT CHR_NUM
+	    FROM CHAT_ROOM chr
+	    WHERE chr.SP_NUM = #{tradingIdx}
+	</select>
+	
+	<select id="selectBuyerName" parameterType="int" resultType="String">
+	  SELECT m.m_name
+	  FROM CHAT_ROOM chr
+	  JOIN member m ON chr.M_NUM = m.m_num
+	  WHERE chr.CHR_NUM = #{chatRoomIdx}
+	</select>
+	
+	<select id="selectUnreadCount" parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM CHAT_MESSAGE
+		WHERE CHR_NUM = #{chatRoomIdx}
+		  AND M_NUM <![CDATA[<>]]> #{sessionMemberIdx}
+		  AND CHM_IS_READ = 0
+	</select>
+	
+	<select id="selectLastMessage" parameterType="int" resultMap="chatMessage2ResultSet">
+		SELECT *
+		FROM CHAT_MESSAGE
+		WHERE CHR_NUM = #{chatRoomIdx}
+		ORDER BY CHM_NUM DESC
+		FETCH FIRST 1 ROW ONLY
+	</select>
+	
+	<select id="isChatRoomExist" parameterType="int" resultType="int">
+		SELECT COUNT(*)
+		FROM CHAT_ROOM
+		WHERE CHR_NUM = #{chatRoomIdx}
+	</select>
+	
+	<update id="setReadMessage" parameterType="map">
+	  UPDATE CHAT_MESSAGE
+	  SET CHM_IS_READ = 1
+	  WHERE CHR_NUM = #{chatRoomIdx}
+	  AND M_NUM <![CDATA[<>]]> #{sessionMemberIdx}
+	  AND CHM_NUM <![CDATA[<=]]> #{lastMessageIdx}
+	</update>
+	
+	<select id="selectUnreadCountForBuyer" parameterType="map" resultType="int">
+	  SELECT COUNT(*)
+	  FROM CHAT_MESSAGE chm
+	  WHERE CHR_NUM = (
+	    SELECT CHR_NUM
+	    FROM CHAT_ROOM chr
+	    WHERE chr.SP_NUM = #{tradingIdx}
+	    	AND chr.M_NUM = #{buyerIdx}
+	  )
+ 	  AND chm.M_NUM <![CDATA[<>]]> #{buyerIdx}
+	  AND chm.CHM_IS_READ = 0
+	</select>
+	
+	<select id="messageReadCheck" parameterType="int" resultType="int">
+	  SELECT COUNT(*)
+	  FROM CHAT_MESSAGE chm 
+	  WHERE chm.CHM_NUM = #{messageIdx}
+	  AND chm.CHM_IS_READ = 1
+	</select>
+
+</mapper>

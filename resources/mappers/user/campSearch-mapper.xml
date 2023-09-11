@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="campSearchMapper">
+	<resultMap type="campSearch" id="campSearchResultSet">
+		<result column="C_NUM" property="campNum"></result>
+		<result column="M_NUM" property="memberNum"></result>
+		<result column="C_NAME" property="campName"></result>
+		<result column="C_POSTCODE" property="campPostCode"></result>
+		<result column="C_TYPE" property="campType"></result>
+		<result column="C_APLACE" property="campAPlace"></result>
+		<result column="C_MAP_X" property="campX"></result>
+		<result column="C_MAP_Y" property="campY"></result>
+		<result column="C_CHECK" property="campCheck"></result>
+		<result column="C_VIEW" property="campView"></result>
+		<result column="C_LIKE" property="likeCamp"></result>
+		<result column="C_ADDR" property="campAddress"></result>
+		<result column="CA_AMENITY" property="campAmenity"></result>
+		<result column="CT_TAG" property="campTag"></result>
+		<result column="C_LAST" property="campLastUpdate"></result>
+		<result column="C_FIRST" property="campFirstUpdate"></result>
+
+		<!-- <result column="C_OFFSD_PRICE" property="campOffsdPrice"></result> 
+			<result column="C_OFFSW_PRICE" property="campOffswPrice"></result> <result 
+			column="C_LINK" property="campLink"></result> <result column="C_INTRO" property="campIntro"></result> 
+			<result column="C_SD_PRICE" property="campSdPrice"></result> <result column="C_SW_PRICE" 
+			property="campSwPrice"></result> -->
+		<result column="C_PHONENUM" property="campPhoneNum"></result>
+		<result column="C_CREATE_DATE" property="campCreateDate"></result>
+	</resultMap>
+
+	<resultMap type="campSearch" id="campPhotoResultSet">
+		<result column="CP_NAME" property="campPhotoName"></result>
+		<result column="CP_URL" property="campPhotoURL"></result>
+	</resultMap>
+	<select id="selectCampSearch" resultMap="campSearchResultSet">
+		SELECT * FROM CAMP_INFO WHERE C_CHECK ='Y'
+	</select>
+
+	<select id="selectCampSearchCount" resultType="_int">
+		SELECT COUNT(*)
+		FROM CAMP_INFO WHERE C_CHECK ='Y'
+	</select>
+	<select id="selectCampSearchAddrType"
+		resultMap="campSearchResultSet">
+		SELECT * FROM CAMP_INFO WHERE C_ADDR LIKE
+		'%'||#{campAddress}||'%' AND
+		C_TYPE = #{campType} AND C_CHECK ='Y'
+	</select>
+
+	<select id="selectCampSearchAddrTypeCount" resultType="_int">
+		SELECT
+		COUNT(*) FROM CAMP_INFO WHERE C_ADDR LIKE '%'||#{campAddress}||'%' AND
+		C_TYPE = #{campType} AND C_CHECK ='Y'
+	</select>
+
+
+	<select id="selectCampGroup" resultMap="campSearchResultSet">
+		SELECT * FROM CAMP_INFO
+		WHERE ${status} LIKE '%'||#{campGroup}||'%' AND C_CHECK ='Y'
+	</select>
+	<select id="selectCampGroupCount" resultType="_int">
+		SELECT COUNT(*)
+		FROM CAMP_INFO WHERE ${status} LIKE '%'||#{campGroup}||'%' AND C_CHECK
+		='Y'
+	</select>
+
+	<select id="selectCampKeyword" resultMap="campSearchResultSet">
+		SELECT * FROM CAMP_INFO
+		WHERE C_NAME LIKE '%' || #{campKeyword} ||'%' AND C_CHECK ='Y'
+	</select>
+	<select id="selectCampKeywordCount" resultType="_int">
+		SELECT COUNT(*)
+		FROM CAMP_INFO WHERE C_NAME LIKE '%' || #{campKeyword} ||'%' AND
+		C_CHECK ='Y'
+	</select>
+
+	<select id="selectCampTag" resultMap="campSearchResultSet">
+		SELECT CT.C_NUM, ci.* FROM
+		CAMP_TAG ct
+		LEFT JOIN CAMP_INFO ci ON ci.C_NUM = ct.C_NUM
+		WHERE
+		ct.${status} LIKE '%' || #{campGroup} || '%' AND ci.C_CHECK ='Y'
+	</select>
+
+	<select id="selectCampAmenity" resultMap="campSearchResultSet">
+		SELECT CA.C_NUM, ci.*
+		FROM
+		CAMP_AMENITY ca
+		LEFT JOIN CAMP_INFO ci ON ci.C_NUM = ca.C_NUM
+		WHERE
+		ca.${status} LIKE '%' || #{campGroup}|| '%' AND ci.C_CHECK ='Y'
+	</select>
+
+
+	<select id="selectCampTagCount" resultType="_int">
+		SELECT COUNT(*) FROM
+		CAMP_TAG ct
+		LEFT JOIN CAMP_INFO ci ON ci.C_NUM = ct.C_NUM
+		WHERE
+		ct.${status} LIKE '%' || #{campGroup} || '%'
+	</select>
+	<select id="selectCampAmenityCount" resultType="_int">
+		SELECT COUNT(*)
+		FROM
+		CAMP_AMENITY ca
+		LEFT JOIN CAMP_INFO ci ON ci.C_NUM = ca.C_NUM
+		WHERE
+		ca.${status} LIKE '%' || #{campGroup} || '%'
+	</select>
+	<select id="selectCampLikeCount" resultType="_int">
+		SELECT COUNT (*)
+		FROM CAMP_LIKE WHERE C_NUM=#{campNum}
+	</select>
+
+
+	<select id="selectCampPhoto" resultMap="campPhotoResultSet">
+		SELECT * FROM
+		CAMP_PHOTO
+		WHERE C_NUM = #{campNum}
+		 ORDER BY CP_NAME ASC
+	</select>
+	<select id="selectCampSearchCategory"
+		resultMap="campSearchResultSet">
+		<choose>
+			<when test='category.equals("campLastUpdate")'>
+				SELECT * FROM CAMP_INFO ci WHERE C_CHECK = 'Y' ORDER
+				BY c_create_date DESC
+			</when>
+			<when test='category.equals("campFirstUpdate")'>
+				SELECT * FROM CAMP_INFO ci WHERE C_CHECK = 'Y' ORDER
+				BY c_create_date ASC
+			</when>
+			<when test='category.equals("campViews")'>
+				SELECT * FROM CAMP_INFO ci WHERE C_CHECK = 'Y' ORDER
+				BY c_view DESC
+			</when>
+			<when test='category.equals("likesCamp")'>
+				SELECT ci.c_name, ci.c_view, ci.C_CREATE_DATE, ci.C_NUM ,COUNT(cl.c_num)
+				AS C_LIKE
+				FROM CAMP_INFO ci
+				LEFT JOIN CAMP_LIKE cl ON ci.c_num = cl.c_num WHERE ci.C_CHECK = 'Y'
+				GROUP BY ci.c_num, ci.c_name, ci.c_view, ci.C_CREATE_DATE , ci.C_NUM
+				ORDER BY COUNT(cl.c_num) DESC
+			</when>
+		</choose>
+	</select>
+
+
+
+</mapper>

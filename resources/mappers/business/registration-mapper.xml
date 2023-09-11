@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="registrationMapper">
+	<resultMap type="campRegistration"
+		id="campRegistrationResultSet">
+		<result column="C_NUM" property="campNum"></result>
+		<result column="M_NUM" property="memberNum"></result>
+		<result column="C_NAME" property="campName"></result>
+		<result column="C_POSTCODE" property="campPostCode"></result>
+		<result column="C_ADDR" property="campAddr"></result>
+		<result column="C_TYPE" property="campType"></result>
+		<result column="C_LINK" property="campLink"></result>
+		<result column="C_APLACE" property="campAPlace"></result>
+		<result column="C_MAP_X" property="campX"></result>
+		<result column="C_MAP_Y" property="campY"></result>
+		<result column="C_CHECK" property="campCheck"></result>
+		<result column="C_INTRO" property="campIntro"></result>
+		<result column="C_OFFSD_PRICE" property="campOffsdPrice"></result>
+		<result column="C_OFFSW_PRICE" property="campOffswPrice"></result>
+		<result column="C_SD_PRICE" property="campSdPrice"></result>
+		<result column="C_SW_PRICE" property="campSwPrice"></result>
+		<result column="C_PHONENUM" property="campPhoneNum"></result>
+		<result column="C_CREATE_DATE" property="campCreateDate"></result>
+		<result column="C_REASON" property="campReason"></result>
+	</resultMap>
+	
+	<resultMap type="campRegistrationPhoto"
+		id="campRegistrationPhotoResultSet">
+		<result column="C_NUM" property="campNum"></result>
+		<result column="CP_NAME" property="campPhotoName"></result>
+		<result column="CP_URL" property="campPhotoURL"></result>
+	</resultMap>
+	
+	<resultMap type="campRegistrationAmenity"
+		id="campRegistrationAmenityResultSet">
+		<result column="C_NUM" property="campNum"></result>
+		<result column="CA_AMENITY" property="campAmenityPhoto"></result>
+		<result column="CA_AME_NAME" property="campAmenityItem"></result>
+	</resultMap>
+	
+	<resultMap type="campRegistrationTag"
+		id="campRegistrationTagResultSet">
+		<result column="C_NUM" property="campNum"></result>
+		<result column="CT_TAG" property="campTagItem"></result>
+	</resultMap>
+
+	<resultMap type="businessRegistration"
+		id="businessRegistrationResultSet">
+		<result column="BR_NUM" property="brNum"></result>
+		<result column="M_NUM" property="memberNum"></result>
+		<result column="BR_COMPANY" property="brCompany"></result>
+		<result column="BR_STTCD" property="brSttCd"></result>
+		<result column="BR_AR_STTCD" property="brArSttCd"></result>
+		<result column="BR_REASON" property="brReason"></result>
+		<result column="BR_REPNAME" property="brRepname"></result>
+		<result column="BR_CREATE_DATE" property="brCreateDate"></result>
+	</resultMap>
+
+
+	
+	<select id="checkBusinessNum"
+		resultType="_int">
+		SELECT COUNT(*) FROM Business_Registration WHERE BR_NUM = #{brNum}
+	</select>
+	
+	<select id="checkBusinessRegistration"
+		resultType="_int">
+		SELECT COUNT(*) FROM Business_Registration WHERE M_NUM = #{memberNum}
+	</select>
+	
+	<select id="selectBusinessRegistration"
+		resultMap="businessRegistrationResultSet">
+		SELECT * FROM Business_Registration WHERE M_NUM = #{memberNum}
+	</select>
+	
+	<insert id="insertBusiness">
+		INSERT INTO Business_Registration
+		(br_num, m_num, br_company, br_SttCd, br_repname, br_Create_date) VALUES 
+		(#{brNum}, #{memberNum}, #{brCompany}, #{brSttCd}, #{brRepname}, #{brCreateDate})
+	</insert>
+
+	<delete id="deleteBusiness">
+		DELETE FROM Business_Registration WHERE m_num = #{memberNum}
+   </delete>
+	
+	<select id="selectCampNum"
+		resultType="_int">
+		SELECT c_num FROM camp_info WHERE m_num=#{memberNum} AND c_postCode = #{campPostCode} AND c_name=#{campName}
+	</select>
+	
+	<insert id="insertCampInfo">
+		INSERT INTO CAMP_INFO
+		(C_NUM, m_num, c_name, c_postcode, c_addr, c_phoneNum, c_type, c_link, c_aplace, c_map_x, c_map_y, C_CHECK, c_intro, c_offsd_price, c_offsw_price, c_sd_price, c_sw_price, c_view, C_CREATE_DATE) VALUES 
+		(ci_num_seq.NEXTVAL, #{memberNum}, #{campName}, #{campPostCode}, #{campAddr}, #{campPhoneNum}, #{campType}, #{campLink}, #{campAPlace}
+		, #{campX}, #{campY}, DEFAULT, #{campIntro}, #{campOffsdPrice}, #{campOffswPrice}, #{campSdPrice}, #{campSwPrice}, DEFAULT, DEFAULT) 
+	</insert>
+	
+	<insert id="insertCampAmenity">
+		INSERT INTO CAMP_AMENITY
+		(c_num, ca_amenity, ca_ame_name) VALUES (#{campNum}, #{campAmenityPhoto}, #{campAmenityItem}) 
+	</insert>
+	
+	<insert id="insertCampTag">
+		INSERT INTO CAMP_TAG
+		(c_num, ct_tag) VALUES (#{campNum}, #{campTagItem}) 
+	</insert>
+	
+	<insert id="insertCampPhoto">
+		INSERT INTO CAMP_PHOTO
+		(c_num, cp_name, cp_URL) VALUES (#{campNum}, #{campPhotoName}, #{campPhotoURL}) 
+	</insert>
+	<select id="selectCampRegistration"
+		resultMap="campRegistrationResultSet">
+		SELECT * FROM CAMP_INFO WHERE c_num = #{campNum}
+	</select>
+	<select id="selectCampRegistrationPhotoList"
+		resultMap="campRegistrationPhotoResultSet">
+		SELECT * FROM CAMP_PHOTO WHERE c_num = #{campNum}
+		ORDER BY
+		cp_name
+	</select>
+	
+	<select id="selectCampRegistrationAmenityList"
+		resultMap="campRegistrationAmenityResultSet">
+		SELECT * FROM CAMP_AMENITY WHERE c_num = #{campNum}
+	</select>
+	
+	<select id="selectCampRegistrationTagList"
+		resultMap="campRegistrationTagResultSet">
+		SELECT * FROM CAMP_TAG WHERE c_num = #{campNum}
+	</select>
+	
+		<select id="selectMyCampRegistrationListCount" resultType="_int">
+		SELECT
+		COUNT(*) FROM CAMP_INFO WHERE m_num = #{memberNum}
+	</select>
+
+	<select id="selectMyCampRegistrationList"
+		resultMap="campRegistrationResultSet">
+		SELECT * FROM CAMP_INFO WHERE m_num = #{memberNum}
+		ORDER BY
+		C_CREATE_DATE DESC
+	</select>
+	
+	<delete id="deleteCampRegistrationAmenityList">
+		DELETE FROM CAMP_AMENITY WHERE c_num = #{campNum}
+	</delete>
+	
+	<delete id="deleteCampRegistrationTagList">
+		DELETE FROM CAMP_TAG WHERE c_num = #{campNum}
+	</delete>
+	
+	<delete id="deleteCampRegistrationPhotoList">
+		DELETE FROM CAMP_PHOTO WHERE c_num = #{campNum}
+	</delete>
+	
+	<delete id="deleteCampRegistration">
+		DELETE FROM CAMP_INFO  WHERE c_num = #{campNum}
+	</delete>
+	
+</mapper>
