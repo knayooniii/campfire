@@ -1,0 +1,35 @@
+section {display: flex; flex-direction: column; justify-content: unset; align-items: stretch;}
+section > * {margin-left: 20px;}
+section > *:nth-child(1) {margin-left: 0; margin-bottom: 8px;}
+
+/* column 전역설정 */
+.columnDivider {flex: 1; display: flex; flex-direction: row; justify-content: stretch;  gap: 20px;}
+.columnDivider .wrapper {flex: 1; display: flex; flex-direction: column; justify-content: stretch;}
+
+.columnDivider .wrapper .container {flex: 1; display: flex;}
+.columnDivider .wrapper .container .labelFormDivider {flex: 1; display: flex; flex-direction: row; justify-content: stretch; align-items: stretch;}
+.columnDivider .wrapper .container .labelFormDivider .label {flex-shrink: 0; width: 100px;}
+.columnDivider .wrapper .container .labelFormDivider .form {flex: 1; display: flex; flex-direction: row; justify-content: stretch; gap: 4px;}
+.columnDivider .wrapper .container .labelFormDivider .form select{flex:1;}
+
+/* #fileContainer */
+.columnDivider .wrapper #fileContainer .labelFormDivider {margin-bottom: 3.75pt;}
+.columnDivider .wrapper #fileContainer .labelFormDivider .form {width: 0; flex: 1; padding: 3.75pt; border: solid 1px rgba(210, 215, 217, 0.75); border-radius: 0.375em;}
+.columnDivider .wrapper #fileContainer .labelFormDivider .form {display: flex; flex-direction: column; justify-content: unset; align-items: stretch;}
+.columnDivider .wrapper #fileContainer .labelFormDivider .form input {flex-grow: 0;}
+.columnDivider .wrapper #fileContainer .labelFormDivider .form .fileList {flex: 1; padding-left: 8px; display: flex; flex-direction: column; justify-content: start; align-items: stretch;}
+.columnDivider .wrapper #fileContainer .labelFormDivider .form .fileList .fileBox {display: flex; flex-direction: row; justify-content: stretch; align-items: center; gap: 8px;}
+.columnDivider .wrapper #fileContainer .labelFormDivider .form .fileList .fileBox * {margin: 0;}
+.columnDivider .wrapper #fileContainer .labelFormDivider .form .fileList .fileBox p { white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+.columnDivider .wrapper #fileContainer .labelFormDivider .form .fileList .fileBox a {flex-shrink: 0; cursor: pointer;}
+
+/* #titleContainer */
+#titleContainer .labelFormDivider {display: flex; flex-direction: row; justify-content: stretch;}
+#titleContainer .labelFormDivider .label {width: 100px; flex-shrink: 0;}
+#titleContainer .labelFormDivider .form {flex-grow: 1; display: flex; flex-direction: row; justify-content: stretch;}
+
+
+/* #actionButtonContainer */
+#actionButtonContainer {display: flex; flex-direction: row; justify-content: center; margin-top: 20pt;}
+
+/* 파일 */

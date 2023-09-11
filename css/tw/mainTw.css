@@ -1,0 +1,36 @@
+
+/* main.css 수정 */
+a.image:hover img {
+  -moz-transform: none;
+  -webkit-transform: none;
+  -ms-transform: none;
+  transform: none;
+}
+
+a {
+  -moz-transition: color 0.2s ease-in-out, border-bottom-color 0.2s ease-in-out;
+  -webkit-transition: color 0.2s ease-in-out, border-bottom-color 0.2s ease-in-out;
+  -ms-transition: color 0.2s ease-in-out, border-bottom-color 0.2s ease-in-out;
+  transition: color 0.2s ease-in-out, border-bottom-color 0.2s ease-in-out;
+  border-bottom: none;
+  color: #00571d;
+  text-decoration: none;
+}
+
+/* 컴포넌트 */
+button[class^="swal2"] { /* .button::not([class^="swal2"]){} */
+	height: unset;
+  line-height: unset;
+  color: #fff !important;
+  letter-spacing: unset;
+  text-align: unset;
+  text-decoration: unset;
+  text-transform: unset;
+  white-space: unset;
+  box-sizing: unset;
+}
+
+.button:hover {
+	
+}
+

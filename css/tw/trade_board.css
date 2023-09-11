@@ -1,0 +1,167 @@
+/*
+trade_board.html
+*/
+
+/* 전역설정 */
+select.disabled {
+    pointer-events: none;
+    opacity: 1;
+    background-image: none;
+    padding-right: 10pt;
+}
+
+.emptyListTextContainer {
+    width: 100%;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* section 다듬기 */
+section {display: flex; flex-direction: column; gap: 8px;}
+
+.searchFilterWrap {margin: 12px 20px 0px 20px;}
+.searchFilterArea {border:1px solid #dbdbdb; min-height: 52px;}
+.searchFilterArea .filter_default {display: flex; flex-direction: row; justify-content: space-between; height: 52px;}
+.searchFilterArea .filter_default .filter_count {display: flex; flex-direction: row; align-items: center; padding: 0 20px 0 20px; font-size:15px; color:#000;}
+.searchFilterArea .filter_default .filter_count .num {font-weight:bold; color:#00571d;}
+.searchFilterArea .filter_default .filter_search {display: flex; flex-direction: row; align-items: stretch;}
+.searchFilterArea .filter_default .filter_search .btn_srh {display: flex; flex-direction: row; align-items: center; padding: 0 10px 0 20px; font-size:15px; color:#3c3c3c; font-weight:bold; cursor:pointer; border-bottom: none; user-select: none;}
+.searchFilterArea .filter_default .filter_search .btn_srh img {max-height: 32px;}
+
+/* option of search results view */
+.searchResultsOptContainer {display: flex; flex-direction: row; justify-content: space-between; min-height: 32px; margin-top: 20px;}
+.searchResultsOptContainer .numViewDiv {display: flex; flex-direction: row;}
+.searchResultsOptContainer .numViewDiv .searchResultsNum {width: 132px; height: 32px;}
+.searchResultsOptContainer .numViewDiv .searchResultsTypeGrid {/*border:1px solid #dbdbdb; border-radius: 0.375em;*/ height: 32px; padding: 4px; cursor:pointer;}
+.searchResultsOptContainer .numViewDiv .searchResultsTypeList {/*border:1px solid #dbdbdb; border-radius: 0.375em;*/ height: 32px; padding: 4px; cursor:pointer;}
+.searchResultsOptContainer .myTradeDiv {display: flex; flex-direction: row; align-items: center;}
+.searchResultsOptContainer .myTradeOptLabel {margin: 0; font-size: 10pt; user-select: none;}
+.searchResultsOptContainer .myTradeOpt:checked+.myTradeOptLabel:before {content: url("../../images/tw/check-solid.svg");}
+
+/* filter item container */
+.searchFilterArea .filter_items {border-width:0 1px 1px 1px; gap:0; display: none; grid-template-columns: 1fr 1fr; grid-template-rows: 104px 104px 52px;}
+.searchFilterArea .filter_items.on {display: grid;}
+.searchFilterArea .filter_items .filter_item {background-color: #f9f9f9; text-align: center; border: 1px solid #dbdbdb; border-width:1px 0 0 0; display: flex; flex-direction: column; align-items: stretch;}
+.searchFilterArea .filter_items .filter_item:first-child {border-width:1px 1px 0 0;}
+.searchFilterArea .filter_items .filter_item:nth-child(3) {border-width:1px 1px 0 0;}
+.searchFilterArea .filter_items .filter_btns:last-child {background-color: inherit;}
+.searchFilterArea .filter_items .filter_btns {grid-column: 1 / -1; display: flex; flex-direction: row; align-items: center; gap: 4px; justify-content: center;}
+.searchFilterArea .filter_items .filter_btns a {width: 84px; padding: 0;}
+
+/* filter item */
+.searchFilterArea .filter_items .filter_item {padding-left: 20px; padding-right: 20px; gap:4px;}
+.searchFilterArea .filter_items .filter_item .item_name {flex:1; text-align: center; /* font-weight: normal; */ margin: 0; display: flex; flex-direction: row; justify-content:center; align-items:end;}
+.searchFilterArea .filter_items .filter_item .item_content_wrap {margin: 0; flex:2; text-align: center; font-weight: normal; display: flex; flex-direction: row; justify-content:stretch; align-items:start;}
+.searchFilterArea .filter_items .filter_item .item_content_wrap .item_content_category {flex:1; gap: 4px; display: flex; flex-direction: row;}
+.searchFilterArea .filter_items .filter_item .item_content_wrap .item_content_keyword {flex:1; gap: 0px; display: flex; flex-direction: row;}
+.searchFilterArea .filter_items .filter_item .item_content_wrap .item_content_region {flex:1; gap: 4px; display: flex; flex-direction: row;}
+.searchFilterArea .filter_items .filter_item .item_content_wrap .item_content_price {flex:1; gap: 1px; display: flex; flex-direction: row; align-items:center;}
+
+/* navigation_bar and write button */
+.nav-writ-wrap {display: flex; flex-direction: row; align-items: start; position: relative;}
+.nav-writ-wrap .pagination-box {flex: 1;}
+.nav-writ-wrap .write_button {position:absolute; top: 0; right: 0; margin-right: 20px;}
+
+/* '상세검색' 접거나 펼치기 */
+.searchFilterArea .filter_items {display: none;}
+.hide {display: none;}
+.grid-show {display: grid;}
+
+/* 리스트뷰 */
+.box.alt{margin-top: 8px;}
+.box.alt div .list-style-item {display: flex; flex-direction: row;}
+.box.alt div .list-style-item .img-box {width:25%; height: 180px;}
+.box.alt .img-box {height: 180px}
+.box.alt .img-box img {object-fit: cover;} 
+.box.alt div .list-style-item .content-box {width:75%; height: 100%; padding-top: 0px;}
+/* 판매완료의 경우 */
+.box.alt .img-box div {flex: 1; display: flex; height: 180px; border-radius: inherit; justify-content: center; align-items: center;}
+.box.alt .img-box div img {height: 100%; width: 100%; border-radius: inherit; filter: blur(2px) brightness(0.6);}
+.box.alt .img-box div h3 {margin-bottom: 8px; position:absolute; z-index: 1; font-size: 36px; color: white; text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);}
+
+/* 게시글 세부조정 */
+.box.alt .content-function {display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 8px;}
+/*.box.alt > *:first-child > *:first-child > .content-box > .content-title {border-top: 1px solid silver;} */
+.box.alt .content-function div {display: flex; flex-direction: row; align-items: center; justify-content: end; gap: 2px;}
+.box.alt .content-function h4 {margin: 0;}
+.box.alt .content-function div {margin: 0;}
+.box.alt .content-function div img {height: 20px;}
+.box.alt .grid-style-item .content-function h4 {margin-bottom: 1em;}
+.box.alt .grid-style-item .content-function div {margin-bottom: 1em;}
+.box.alt .list-style-item .content-function h4 {margin-bottom: 0;}
+.box.alt .list-style-item .content-function div {margin-bottom: 0;}
+
+/* 게시글 클릭 */
+.grid-style-item {cursor:pointer;}
+.list-style-item {cursor:pointer;}
+
+/* .searchFilterArea .filter_items .filter_item_list {overflow:hidden; border:1px solid #dbdbdb; border-width:1px 0; background:#f9f9f9;}
+.searchFilterArea .filter_items .item {float:left; width:25%; border-left:1px solid #dbdbdb; box-sizing:border-box; }
+.searchFilterArea .filter_items .item:first-child {border-left:none;}
+.searchFilterArea .filter_items .item .tit {display:block; height:39px; line-height:39px; text-align:center; border-bottom:1px solid #dbdbdb;}
+.searchFilterArea .filter_items .option_box {height:213px; overflow-y:auto; overflow-x:hidden;}
+.searchFilterArea .filter_items .option_box > ul {padding:20px;}
+.searchFilterArea .filter_items .option_box li {position:relative;}
+.searchFilterArea .filter_items .option_box [class^="option_"] input {width:0; height:0; font-size:0; overflow:hidden; filter:alpha(opacity=0); opacity:0; position:absolute; left:0; top:0;} */
+
+/* filter input : arrow type */
+/* .searchFilterArea .filter_items .option_box .option_chk li {margin-top:10px;}
+.searchFilterArea .filter_items .option_box .option_chk li:first-child {margin-top:0;}
+.searchFilterArea .filter_items .option_box .option_chk label {width:100%; height:16px; box-sizing:border-box; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:inline-block; line-height:1; position:relative; padding-left:25px;}
+.searchFilterArea .filter_items .option_box .option_chk label:before {width:14px; height:14px; background:#fff; border:1px solid #dbdbdb; display:block; position:absolute; left:0; top:0; content:''}
+.searchFilterArea .filter_items .option_box .option_chk input:checked + label:before {border-color:#000}
+.searchFilterArea .filter_items .option_box .option_chk input:checked + label:after {border:1px solid #000; border-width:1px 0 0 1px ; width:4px; height:7px; transform:rotate(-135deg); content:''; position:absolute; left:6px; top:2px;} */
+/* filter input : color type */
+/* .searchFilterArea .filter_items .option_box .option_color {overflow:hidden;}
+.searchFilterArea .filter_items .option_box .option_color li {float:left; margin:0 0 8px 8px;}
+.searchFilterArea .filter_items .option_box .option_color label {position:relative; font-size:0; display:block; width:24px; height:24px; background:#fff; border:1px solid #dbdbdb; padding:3px; box-sizing:border-box;}
+.searchFilterArea .filter_items .option_box .option_color label:after {content:''; width:16px; height:16px; display:block;}
+.searchFilterArea .filter_items .option_box .option_color  input[type="checkbox"]:checked + label {border-color:#000;} */
+/* search result  */
+/* .searchFilterArea .filter_result ul {overflow:hidden;  border-width:1px 0; border-top:1px solid #dbdbdb; display:flex; display:-ms-flexbox; display:-webkit-flex;}
+.searchFilterArea .filter_result ul li {float:left; width:25%; padding:18px 10px; box-sizing:border-box; border-left:1px solid #dbdbdb; text-align:center; font-size:13px; color:#3c3c3c; font-weight:bold; }
+.searchFilterArea .filter_result ul li:first-child {border-left:none;}
+.searchFilterArea .filter_result ul li .tx_b {text-align:center; margin-top:5px;}
+.searchFilterArea .filter_result ul li .tx_b:first-child {margin-top:0;}
+.searchFilterArea .filter_result ul li .tx_i {display:inline-block;}
+.searchFilterArea .filter_result ul li .tx_b,
+.searchFilterArea .filter_result ul li .size,
+.searchFilterArea .filter_result ul li .color {width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.searchFilterArea .filter_result .color_select [class^="uq_cl_"] {display:inline-block; width:16px; height:16px; font-size:0; overflow:hidden; box-sizing:border-box;} 
+/* filter color */
+/* .searchFilterArea .filter_result .color_select .uq_cl_white {border:1px solid #dbdbdb;}
+.searchFilterArea .filter_result .color_select .uq_cl_white,
+.searchFilterArea .filter_items .option_box .uq_cl_white label:after {background-color:rgb(255, 255, 255);}
+.searchFilterArea .filter_result .color_select .uq_cl_gray,
+.searchFilterArea .filter_items .option_box .uq_cl_gray label:after {background-color:rgb(163, 163, 163);}
+.searchFilterArea .filter_result .color_select .uq_cl_black,
+.searchFilterArea .filter_items .option_box .uq_cl_black label:after {background-color:rgb(0, 0, 0);}
+.searchFilterArea .filter_result .color_select .uq_cl_pink,
+.searchFilterArea .filter_items .option_box .uq_cl_pink label:after {background-color:rgb(246, 111, 164);}
+.searchFilterArea .filter_result .color_select .uq_cl_red,
+.searchFilterArea .filter_items .option_box .uq_cl_red label:after {background-color:rgb(206, 13, 22);}
+.searchFilterArea .filter_result .color_select .uq_cl_orange,
+.searchFilterArea .filter_items .option_box .uq_cl_orange label:after {background-color:rgb(253, 152, 40);}
+.searchFilterArea .filter_result .color_select .uq_cl_brown,
+.searchFilterArea .filter_items .option_box .uq_cl_brown label:after {background-color:rgb(101, 63, 51);}
+.searchFilterArea .filter_result .color_select .uq_cl_yellow,
+.searchFilterArea .filter_items .option_box .uq_cl_yellow label:after {background-color:rgb(254, 204, 47);}
+.searchFilterArea .filter_result .color_select .uq_cl_green,
+.searchFilterArea .filter_items .option_box .uq_cl_green label:after {background-color:rgb(88, 177, 68);}
+.searchFilterArea .filter_result .color_select .uq_cl_blue,
+.searchFilterArea .filter_items .option_box .uq_cl_blue label:after {background-color:rgb(70, 132, 220);}
+.searchFilterArea .filter_result .color_select .uq_cl_purple,
+.searchFilterArea .filter_items .option_box .uq_cl_purple label:after {background-color:rgb(172, 88, 220);}
+.searchFilterArea .filter_result .color_select .uq_cl_etc,
+.searchFilterArea .filter_items .option_box .uq_cl_etc label:after {background-color:rgb(0, 0, 0);}
+.searchFilterArea .filter_result .color_select .uq_cl_etc:before, 
+.searchFilterArea .filter_items .option_box .uq_cl_etc label:after,
+.searchFilterArea .filter_items .option_box .uq_cl_etc label:before {width:16px; height:8px; display:block;}
+.searchFilterArea .filter_result .color_select .uq_cl_etc:before, 
+.searchFilterArea .filter_items .option_box .uq_cl_etc label:before {content:''; background-color:rgb(163, 163, 163);} */
+
+/*.searchFilterArea .filter_btns {text-align:center; padding:10px 0;}*/
+/* .searchFilter_resultNone {padding:140px 0;}
+.searchFilter_resultNone p {font-size:15px; font-weight:bold; color:#3c3c3c; text-align:center; } */
